@@ -6,13 +6,27 @@ import (
 	"github.com/gocolly/colly"
 )
 
+type BookProduct struct {
+	url   string
+	image string
+	name  string
+	price string
+}
+
 func main() {
-	c := colly.NewCollector(
-		colly.AllowedDomains("en.wikipedia.org"),
-	)
-	c.OnHTML(".mw-page-container-inner", func(e *colly.HTMLElement) {
-		links := e.ChildAttrs("a", "href")
-		fmt.Println(links)
+	var books []BookProduct
+	c := colly.NewCollector()
+
+	c.OnHTML(".product_pod", func(e *colly.HTMLElement) {
+		bookProd := BookProduct{}
+		bookProd.url = e.ChildAttr("a", "href")
+		bookProd.image = e.ChildAttr("img", "src")
+		bookProd.name = e.ChildText("h3")
+		bookProd.price = e.ChildText(".price_color")
+		books = append(books, bookProd)
 	})
-	c.Visit("https://en.wikipedia.org/wiki/Go_(programming_language)")
+	c.Visit("http://books.toscrape.com/")
+
+	fmt.Println(books)
+
 }
