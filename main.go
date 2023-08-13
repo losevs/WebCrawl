@@ -1,7 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"encoding/csv"
+	"log"
+	"os"
 
 	"github.com/gocolly/colly"
 )
@@ -27,6 +29,30 @@ func main() {
 	})
 	c.Visit("http://books.toscrape.com/")
 
-	fmt.Println(books)
+	file, err := os.Create("books.csv")
+	if err != nil {
+		log.Fatalln("failed to open", err)
+	}
+	defer file.Close()
 
+	writer := csv.NewWriter(file)
+
+	headers := []string{
+		"url",
+		"image",
+		"name",
+		"price",
+	}
+	writer.Write(headers)
+
+	for _, book := range books {
+		rec := []string{
+			book.url,
+			book.image,
+			book.name,
+			book.price,
+		}
+		writer.Write(rec)
+	}
+	defer writer.Flush()
 }
