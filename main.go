@@ -8,7 +8,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-type BookProduct struct {
+type ArtProduct struct {
 	url   string
 	image string
 	name  string
@@ -16,20 +16,20 @@ type BookProduct struct {
 }
 
 func main() {
-	var books []BookProduct
+	var arts []ArtProduct
 	c := colly.NewCollector()
 
-	c.OnHTML(".product_pod", func(e *colly.HTMLElement) {
-		bookProd := BookProduct{}
-		bookProd.url = e.ChildAttr("a", "href")
-		bookProd.image = e.ChildAttr("img", "src")
-		bookProd.name = e.ChildText("h3")
-		bookProd.price = e.ChildText(".price_color")
-		books = append(books, bookProd)
+	c.OnHTML(".product", func(e *colly.HTMLElement) {
+		ArtProd := ArtProduct{}
+		ArtProd.url = e.ChildAttr("a", "href")
+		ArtProd.image = e.ChildAttr("img", "src")
+		ArtProd.name = e.ChildText(".product b")
+		ArtProd.price = e.ChildText(".product i")
+		arts = append(arts, ArtProd)
 	})
-	c.Visit("http://books.toscrape.com/")
+	c.Visit("http://www.pollynorstore.co.uk/products")
 
-	file, err := os.Create("books.csv")
+	file, err := os.Create("arts.csv")
 	if err != nil {
 		log.Fatalln("failed to open", err)
 	}
@@ -45,7 +45,7 @@ func main() {
 	}
 	writer.Write(headers)
 
-	for _, book := range books {
+	for _, book := range arts {
 		rec := []string{
 			book.url,
 			book.image,
